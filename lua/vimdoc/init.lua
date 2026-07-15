@@ -1,7 +1,7 @@
 local M = {}
 
 function M.open(page)
-    print("Opening docs for:", page)
+    print("Getting docs for:", page)
 end
 
 return M
