@@ -1,7 +1,12 @@
 local M = {}
 
-function M.fetch(page)
-    local url = "https://raw.githubusercontent.com/vrld/hump/refs/heads/master/docs/" .. page .. ".rst"
+local function genUrl(source, page)
+    return "https://raw.githubusercontent.com/" .. source.repo ..
+        "/refs/heads/" .. source.branch .. "/" .. source.docs .. "/" .. page .. source.extension
+end
+
+function M.fetch(source, page)
+    local url = genUrl(source, page)
     print("Fetching:")
     print(url)
 
