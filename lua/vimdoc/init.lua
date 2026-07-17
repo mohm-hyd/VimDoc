@@ -22,7 +22,7 @@ function M.open(query)
     end
     local fetcher = require("vimdoc.source." .. source_config.fetcher)
     local docs = fetcher.fetch(source_config, page)
-    require("vimdoc.core.renderer").render(docs,source_config.format)
+    require("vimdoc.core.renderer").render(docs,source_config.format,query)
 end
 
 return M
