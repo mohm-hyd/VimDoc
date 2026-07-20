@@ -5,8 +5,8 @@ local function genUrl(source, page)
         "/refs/heads/" .. source.branch .. "/" .. source.docs .. "/" .. page .. source.extension
 end
 
-function M.fetch(source, page)
-    local url = genUrl(source, page)
+function M.fetch(doc)
+    local url = genUrl(doc.source, doc.page)
     print("Fetching:")
     print(url)
 

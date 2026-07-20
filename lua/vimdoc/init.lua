@@ -1,6 +1,16 @@
-local M = {}
+local M        = {}
 
-M.config = {
+local api      = require("vimdoc.core.api")
+local cache    = require("vimdoc.core.cache")
+local renderer = require("vimdoc.core.renderer")
+local writer   = require("vimdoc.core.writer")
+local utils    = require("vimdoc.core.utils")
+
+local fetchers = {
+    github = require("vimdoc.source.github"),
+}
+
+M.config       = {
     sources = {}
 }
 
@@ -18,17 +28,26 @@ end
 
 function M.open(query)
     print("Getting the docs for:", query)
-    local source_name, page = query:match("^([^.]+)%.(.+)$")
-    local source_config = M.config.sources[source_name]
-    if not source_config then
-        print("Unknown source: " .. source_name)
+
+    local doc = utils.parse_query(query, M.config)
+
+    if not doc.source then
+        print("Unknown source: " .. doc.source_name)
         return
     end
-    local tag = query
-    local source = require("vimdoc.source." .. source_config.fetcher)
-    local raw = source.fetch(source_config, page)
-    local rendered = require("vimdoc.core.render").render(raw, source_config.format, tag)
-    require("vimdoc.core.writer").write(M.config.output_dir.."/" .. tag .. ".txt",rendered)
+
+    local path = M.config.output_dir .. "/" .. doc.source_name .. "/" .. doc.tag .. ".txt"
+
+    if cache.chech_cache(path) then
+        print("Doc already exists: " .. doc.tag)
+        vim.cmd("h " .. doc.tag)
+        return
+    end
+
+    local fetcher = fetchers[doc.source.fetcher]
+    local raw = fetcher.fetch(doc)
+    local rendered = renderer.render(raw, doc)
+    writer.write(path, rendered)
     M.update()
 end
 

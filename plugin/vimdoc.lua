@@ -1,5 +1,5 @@
 vim.api.nvim_create_user_command(
-    "VimDoc",
+    "Vimdoc",
     function(opts)
         require("vimdoc").open(opts.args)
     end,

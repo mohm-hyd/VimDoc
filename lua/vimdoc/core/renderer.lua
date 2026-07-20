@@ -1,22 +1,23 @@
 local M = {}
-function M.render(text, format, tag)
-    print("Documentation format: ", format)
-    local doc = {
-        "*" .. tag .. "*",
+function M.render(text,doc)
+    print("Documentation format: ", doc.source.format)
+    local header = {
+        "*" .. doc.tag .. "*",
+
         "",
     }
     local lines = vim.split(text, "\n")
-    vim.list_extend(doc, lines)
-    return doc
+    vim.list_extend(header, lines)
+    return header
 end
 
-function M.preview(text,format,tag)
+function M.preview(text,doc)
     local buf = vim.api.nvim_create_buf(false, true)
-    print("Documentation format: ", format)
-    vim.api.nvim_buf_set_name(buf, "vimdoc://" .. tag)
+    print("Documentation format: ", doc.source.format)
+    vim.api.nvim_buf_set_name(buf, "vimdoc://" .. doc.tag)
     vim.bo[buf].filetype = "help"
     local header = {
-        "*" .. tag .. "*",
+        "*" .. doc.tag .. "*",
         "",
     }
     local lines = vim.split(text, "\n")
