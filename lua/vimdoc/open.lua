@@ -1,15 +1,16 @@
-local M        = {}
+local M          = {}
 
-local helptags = require("vimdoc.helptags")
-local config = require("vimdoc.config")
-local cache    = require("vimdoc.cache")
-local writer   = require("vimdoc.writer")
-local fetchers = require("vimdoc.fetchers")
+local helptags   = require("vimdoc.helptags")
+local config     = require("vimdoc.config")
+local cache      = require("vimdoc.cache")
+local writer     = require("vimdoc.writer")
+local fetchers   = require("vimdoc.fetchers")
 local extractors = require("vimdoc.extractors")
-local renderers = require("vimdoc.renderers")
+local renderers  = require("vimdoc.renderers")
 
 
-function M.open (request)
+function M.open(request)
+
     print("Getting the docs for:", request.page)
     local source = config.options.sources[request.source]
 
@@ -21,12 +22,12 @@ function M.open (request)
     local doc = {
         source = source,
         page = request.page,
-        tag = request.source .. "." ..request.page,
+        tag = request.source .. "." .. request.page,
     }
 
-    local path = config.options.output_dir .. "/" .. doc.source.name.. "/" .. doc.tag .. ".txt"
+    local path = config.options.output_dir .. "/" .. doc.source.name .. "/" .. doc.tag .. ".txt"
 
-    if cache.chech_cache(path) then
+    if cache.check_cache(path) then
         print("Doc already exists: " .. doc.tag)
         vim.cmd("h " .. doc.tag)
         return
@@ -35,13 +36,14 @@ function M.open (request)
     doc.raw = fetchers[doc.source.fetcher].fetch(doc)
     assert(doc.raw, "Fetcher returned no data")
 
-    doc.content= extractors[doc.source.config.format].extract(doc)
+    doc.content = extractors[doc.source.config.format].extract(doc)
     assert(doc.content, "Extractor returned no content")
 
-    doc.output= renderers[doc.source.config.format].render(doc)
-    writer.write(path,doc.output)
+    doc.output = renderers[doc.source.config.format].render(doc)
+    writer.write(path, doc.output)
 
     helptags.update()
+    vim.cmd("h " .. doc.tag)
 end
 
 return M
