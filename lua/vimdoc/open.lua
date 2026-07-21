@@ -5,7 +5,7 @@ local config     = require("vimdoc.config")
 local cache      = require("vimdoc.cache")
 local writer     = require("vimdoc.writer")
 local fetchers   = require("vimdoc.fetchers")
-local extractors = require("vimdoc.extractors")
+local parsers = require("vimdoc.parsers")
 local renderers  = require("vimdoc.renderers")
 
 
@@ -36,8 +36,8 @@ function M.open(request)
     doc.raw = fetchers[doc.source.fetcher].fetch(doc)
     assert(doc.raw, "Fetcher returned no data")
 
-    doc.content = extractors[doc.source.config.format].extract(doc)
-    assert(doc.content, "Extractor returned no content")
+    doc.content = parsers[doc.source.config.format].parse(doc.raw)
+    assert(doc.content, "Parser returned no content")
 
     doc.output = renderers[doc.source.config.format].render(doc)
     writer.write(path, doc.output)

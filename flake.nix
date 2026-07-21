@@ -15,12 +15,27 @@
           pkgs.git
           pkgs.curl
         ];
-
         shellHook = ''
-          echo "VimDoc testing environment"
-          echo "Running : nvim -u init.lua ."
-          nvim -u init.lua
+          echo "Vimdoc testing environment"
+          echo "Test env: nvim -u init.lua ."
         '';
       };
+
+      checks.${system}.default =
+        pkgs.runCommand "Vimdoc-tests"
+          {
+            buildInputs = [
+              pkgs.neovim
+            ];
+          }
+          ''
+            cd ${self}
+
+            nvim --headless \
+                -u tests/init.lua \
+                -c "lua dofile('tests/run.lua')" \
+                -c "qa"
+            touch $out
+          '';
     };
 }

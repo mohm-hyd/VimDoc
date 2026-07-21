@@ -1,6 +1,6 @@
-local fetchers = {
+local M = {
     github = require("vimdoc.fetchers.github"),
     mediawiki = require("vimdoc.fetchers.mediawiki")
 }
 
-return fetchers
+return M

@@ -1,39 +1,29 @@
 local M = {}
 
 function M.render(doc)
-    print("Documentation format: ", doc.source.config.format)
-    local text = {
-        "*" .. doc.tag .. "*",
+    local output = {}
 
-        "",
-    }
-    local lines = vim.split(doc.content, "\n")
-    vim.list_extend(text, lines)
-    return text
-end
+    table.insert(output, "*" .. doc.tag .. "*")
+    table.insert(output, "")
 
-function M.preview(doc)
-    local buf = vim.api.nvim_create_buf(false, true)
-    print("Documentation format: ", doc.source.config.format)
-    vim.api.nvim_buf_set_name(buf, "vimdoc://" .. doc.tag)
-    vim.bo[buf].filetype = "help"
-    local text = {
-        "*" .. doc.tag .. "*",
-        "",
-    }
-    local lines = vim.split(doc.content, "\n")
-    vim.list_extend(text, lines)
-    vim.api.nvim_buf_set_lines(
-        buf,
-        0,
-        -1,
-        false,
-        text
-    )
-    print("buffer: ", buf)
-    print("lines: ", #vim.api.nvim_buf_get_lines(buf, 0, -1, false))
-
-    vim.api.nvim_set_current_buf(buf)
+    for _, block in ipairs(doc.content) do
+        if block.type == "heading" then
+            table.insert(output, block.text)
+            if block.level == 1 then
+                table.insert(output, string.rep("=", #block.text))
+            elseif block.level == 2 then
+                table.insert(output, string.rep("=", #block.text))
+            end
+            table.insert(output, "")
+        elseif block.type == "paragraph" then
+            table.insert(output, block.text)
+            table.insert(output, "")
+        elseif block.type == "code" then
+            table.insert(output, block.text)
+            table.insert(output, "")
+        end
+    end
+    return table.concat(output, "\n")
 end
 
 return M
