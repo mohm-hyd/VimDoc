@@ -27,12 +27,14 @@
             buildInputs = [
               pkgs.neovim
             ];
+            src = self;
           }
           ''
-            cd ${self}
+            cd $src
 
             nvim --headless \
                 -u tests/init.lua \
+                -i NONE \
                 -c "lua dofile('tests/run.lua')" \
                 -c "qa"
             touch $out

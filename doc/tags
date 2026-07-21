@@ -1,6 +1,0 @@
-after	hump/hump.timer.txt	/*after*
-before	hump/hump.timer.txt	/*before*
-for	hump/hump.timer.txt	/*for*
-hump.timer	hump/hump.timer.txt	/*hump.timer*
-not	hump/hump.timer.txt	/*not*
-tweening	hump/hump.timer.txt	/*tweening*
