@@ -19,7 +19,7 @@ function M.render(doc)
             table.insert(output, block.text)
             table.insert(output, "")
         elseif block.type == "code" then
-            table.insert(output, block.text)
+            table.insert(output, "    "..block.text)
             table.insert(output, "")
         elseif block.type == "list" then
             for _, item in ipairs(block.items) do

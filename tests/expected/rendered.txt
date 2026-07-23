@@ -1,0 +1,16 @@
+*render.test*
+
+Test Document
+=============
+
+This is a simple paragraph that should be parsed correctly.
+
+    print("hello world")
+    print("another line")
+
+Features
+========
+
+*First item
+*Second item
+*Third item
