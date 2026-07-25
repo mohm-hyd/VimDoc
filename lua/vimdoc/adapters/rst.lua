@@ -1,34 +1,6 @@
+local Block=require("vimdoc.blocks")
+
 local M = {}
-
---Block creation
-local function new_heading(text, level)
-    return {
-        type = "heading",
-        level = level,
-        text = text,
-    }
-end
-
-local function new_paragraph(text)
-    return {
-        type = "paragraph",
-        text = text
-    }
-end
-
-local function new_code_block(text)
-    return {
-        type = "code",
-        text = text
-    }
-end
-
-local function new_list_block(items)
-    return {
-        type = "list",
-        items = items,
-    }
-end
 
 --Helpers
 
@@ -82,7 +54,7 @@ local function handle_section(node,blocks, lines,walk)
         if title then
             table.insert(
                 blocks,
-                new_heading(node_text(title, lines), heading_level(node, lines))
+                Block.heading(node_text(title, lines), heading_level(node, lines))
             )
         end
 
@@ -102,14 +74,14 @@ end
 local function handle_paragraph(node,blocks,lines)
         table.insert(
             blocks,
-            new_paragraph(node_text(node, lines))
+            Block.paragraph(node_text(node, lines))
         )
 end
 
 local function handle_codeblock(node,blocks,lines)
         table.insert(
             blocks,
-            new_code_block(node_text(node, lines))
+            Block.code(node_text(node, lines))
         )
 end
 
@@ -128,7 +100,7 @@ local function handle_list(node,blocks,lines)
         end
         table.insert(
             blocks,
-            new_list_block(items)
+            Block.list(items)
         )
 end
 

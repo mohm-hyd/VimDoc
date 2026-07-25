@@ -15,6 +15,15 @@ require("nvim-treesitter").setup({
 require("vimdoc").setup({
     output_dir = "./doc",
     sources = {
+        rtd = {
+            name = "readthedocs",
+            fetcher = "github",
+            repo = "readthedocs/readthedocs.org",
+            branch = "main",
+            doc_path = "docs/user",
+            format = "rst",
+            extension =".rst",
+        },
         hump = {
 
             name = "hump",
@@ -41,7 +50,7 @@ require("vimdoc").setup({
             fetcher = "mediawiki",
             project_url = "https://love2d.org",
             endpoint = "/w/index.php",
-            format = "mediawiki",
+            format = "html",
         },
 
         arch = {
@@ -49,7 +58,7 @@ require("vimdoc").setup({
             fetcher = "mediawiki",
             project_url = "https://wiki.archlinux.org",
             endpoint = "/api.php",
-            format = "mediawiki",
+            format = "html",
         }
 
     },

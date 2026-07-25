@@ -1,12 +1,12 @@
-local M        = {}
-
-local helptags = require("vimdoc.helptags")
 local config   = require("vimdoc.config")
-local cache    = require("vimdoc.cache")
-local writer   = require("vimdoc.writer")
 local fetchers = require("vimdoc.fetchers")
 local parser   = require("vimdoc.parser")
 local renderer = require("vimdoc.render")
+local writer   = require("vimdoc.writer")
+local cache    = require("vimdoc.cache")
+local helptags = require("vimdoc.helptags")
+
+local M        = {}
 
 
 function M.open(request)
@@ -32,8 +32,17 @@ function M.open(request)
         return
     end
 
-    doc.raw = fetchers[doc.source.fetcher].fetch(doc)
-    assert(doc.raw, "Fetcher returned no data")
+    local raw, err = fetchers[doc.source.fetcher].fetch(doc)
+
+    if not raw then
+        vim.notify(
+            "Failed to fetch " .. doc.tag .. ": " .. err,
+            vim.log.levels.ERROR
+        )
+        return
+    end
+
+    doc.raw = raw
 
     doc.content = parser.parse(doc)
     assert(doc.content, "Parser returned no content")
@@ -41,7 +50,7 @@ function M.open(request)
     doc.output = renderer.render(doc)
     writer.write(path, doc.output)
 
-    helptags.update()
+    helptags.update_helptags()
     vim.cmd("h " .. doc.tag)
 end
 
