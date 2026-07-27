@@ -8,7 +8,7 @@ VimDoc fetches documentation from external sources, converts it into native Vim 
 and integrates it with Neovim's built-in `:help` system.
 
 VimDoc first downloads and converts documentation into Vim help files.
-Once generated, the documentation becomes available through Neovim's built-in :help command.
+Once generated, the documentation becomes available through Neovim's built-in `:help` command.
 Each documentation format (RST, Markdown, HTML, etc.) is implemented as an adapter
 that converts raw documentation into a common intermediate representation before rendering.
 This architecture allows multiple documentation formats to share the same rendering pipeline.
@@ -76,18 +76,17 @@ to access documentation inside Neovim.
 
 ## Architecture
 
-Fetcher
-    ↓
-Extractor
-    ↓
-Parser / Adapter
-    ↓
-Block representation
-    ↓
-Renderer
-    ↓
-Vim + Helptags
+```mermaid
+flowchart TD
+    A[Fetcher]
+    B[Extractor]
+    C[Parser / Adapter]
+    D[Block Representation]
+    E[Renderer]
+    F[Generated Vim Help File]
 
+    A --> B --> C --> D --> E --> F
+```
 
 ## Project Roadmap
 
