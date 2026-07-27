@@ -62,11 +62,7 @@ local function handle_section(node,blocks, lines,walk)
             local child = node:child(i)
 
             if child:type() ~= "title" and child:type() ~= "adornment" then
-                if child:type() == "section" then
                     walk(child, blocks, lines)
-                else
-                    walk(child, blocks, lines)
-                end
             end
         end
 end
