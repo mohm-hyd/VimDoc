@@ -41,7 +41,7 @@ require("vimdoc").setup({
             repo = "Yonaba/Moses",
             branch = "master",
             doc_path = "doc",
-            format = "md",
+            format = "markdown",
             extension = ".md",
         },
 

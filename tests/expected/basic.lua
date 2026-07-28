@@ -12,7 +12,10 @@ return {
 
     {
         type = "code",
+        content = {
+        type = "lua",
         text = 'print("hello world")\n    print("another line")'
+        },
     },
 
     {

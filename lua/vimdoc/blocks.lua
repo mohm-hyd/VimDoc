@@ -16,10 +16,13 @@ end
     }
 end
 
- function M.code(text)
+ function M.code(text,lang)
     return {
         type = "code",
-        text = text
+        content = {
+            language = lang or "lua",
+            text = text,
+        },
     }
 end
 

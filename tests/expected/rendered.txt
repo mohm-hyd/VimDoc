@@ -5,8 +5,10 @@ Test Document
 
 This is a simple paragraph that should be parsed correctly.
 
+>lua
     print("hello world")
     print("another line")
+<
 
 Features
 ========
