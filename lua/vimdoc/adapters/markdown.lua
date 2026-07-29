@@ -1,9 +1,19 @@
 local Block = require("vimdoc.blocks")
 
 local M = {}
+local function normalize_inline(text)
+    -- remove HTML anchors
+    text = text:gsub("<a.-</a>", function(anchor)
+        return anchor:match(">(.-)<") or ""
+    end)
 
+    -- remove markdown links
+    text = text:gsub("%[(.-)%]%b()", "%1")
+
+    return text
+end
 local function node_text(node, source)
-    return vim.treesitter.get_node_text(node, source)
+    return normalize_inline(vim.treesitter.get_node_text(node, source))
 end
 
 

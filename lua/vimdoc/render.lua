@@ -2,6 +2,17 @@ local M = {}
 
 --renderers
 
+local function render_inline(content)
+    local pieces = {}
+
+    for _, node in ipairs(content) do
+        if node.type == "text" then
+            table.insert(pieces,node.text)
+        end
+    end
+    return table.concat(pieces)
+end
+
 local function render_heading(block, output)
     table.insert(output, block.text)
     if block.level == 1 then
@@ -13,13 +24,13 @@ local function render_heading(block, output)
 end
 
 local function render_paragraph(block, output)
-    table.insert(output, block.text)
+    table.insert(output, render_inline(block.children))
     table.insert(output, "")
 end
 
 local function render_code(block, output)
-    table.insert(output, ">" .. block.content.language)
-    for line in block.content.text:gmatch("[^\n]+") do
+    table.insert(output, ">" .. block.children.language)
+    for line in block.children.text:gmatch("[^\n]+") do
         table.insert(output, "    " .. line)
     end
     table.insert(output, "<")

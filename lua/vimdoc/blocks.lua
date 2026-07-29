@@ -1,3 +1,6 @@
+local inline = require("vimdoc.inline")
+
+
 --Block creation
  M = {}
 
@@ -12,14 +15,16 @@ end
  function M.paragraph(text)
     return {
         type = "paragraph",
-        text = text
+        children = {
+            inline.text(text),
+        }
     }
 end
 
  function M.code(text,lang)
     return {
         type = "code",
-        content = {
+        children = {
             language = lang or "lua",
             text = text,
         },

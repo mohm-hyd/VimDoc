@@ -7,14 +7,18 @@ return {
 
     {
         type = "paragraph",
-        text = "This is a simple paragraph that should be parsed correctly.",
+        children = { {
+            type = "text",
+            text = "This is a simple paragraph that should be parsed correctly.",
+        }
+        }
     },
 
     {
         type = "code",
-        content = {
-        type = "lua",
-        text = 'print("hello world")\n    print("another line")'
+        children = {
+            language = "lua",
+            text = 'print("hello world")\n    print("another line")'
         },
     },
 
