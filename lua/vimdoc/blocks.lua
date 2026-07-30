@@ -1,4 +1,3 @@
-local inline = require("vimdoc.inline")
 
 
 --Block creation
@@ -12,12 +11,10 @@ function M.heading(text, level)
     }
 end
 
- function M.paragraph(text)
+ function M.paragraph(children)
     return {
         type = "paragraph",
-        children = {
-            inline.text(text),
-        }
+        children = children
     }
 end
 

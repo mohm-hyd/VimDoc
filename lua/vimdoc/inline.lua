@@ -1,5 +1,6 @@
 local M = {}
 
+
 function M.text(text)
     return {
         type = "text",

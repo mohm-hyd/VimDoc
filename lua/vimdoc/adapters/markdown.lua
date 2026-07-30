@@ -1,6 +1,63 @@
 local Block = require("vimdoc.blocks")
+local inline = require("vimdoc.inline")
 
 local M = {}
+
+local function handle_inline_text()
+
+end
+
+local function handle_inline_link()
+
+end
+
+local function handle_inline_code()
+
+end
+
+local function handle_inline_strong()
+
+end
+
+local function handle_inline_emphasis()
+
+end
+
+local function handle_inline_anchor()
+
+end
+
+local inline_handlers = {
+    text = handle_inline_text,
+    link = handle_inline_link,
+    code = handle_inline_code,
+    strong = handle_inline_strong,
+    emphasis = handle_inline_emphasis,
+    anchor = handle_inline_anchor,
+
+}
+
+
+
+
+local function parse_inline(node, lines)
+    inline_nodes = {}
+    local text
+
+    for child in node:iter_children() do
+        if child:type() == "inline" then
+            text = node_text(child, lines)
+        end
+
+        local start_link, end_link, label, target = text:find("%[([^%]]+)%]%(([^%)]+)%)")
+
+        if start_link then
+            inline_handlers.link(start_link, end_link, label, target)
+        end
+    end
+end
+
+
 local function normalize_inline(text)
     -- remove HTML anchors
     text = text:gsub("<a.-</a>", function(anchor)
