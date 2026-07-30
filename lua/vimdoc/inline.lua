@@ -8,10 +8,10 @@ function M.text(text)
     }
 end
 
-function M.link(text, target)
+function M.link(children, target)
     return {
         type = "link",
-        text = text,
+        children = children,
         target = target,
     }
 end
@@ -23,24 +23,25 @@ function M.inline_code(text)
     }
 end
 
-function M.strong(text)
+function M.strong(children)
     return {
         type = "strong",
-        text = text,
+        children = children,
     }
 end
 
-function M.emphasis(text)
+function M.emphasis(children)
     return {
         type = "emphasis",
-        text = text,
+        children = children,
     }
 end
 
-function M.anchor(id)
+function M.anchor(id,children)
     return {
         type = "anchor",
         id = id,
+        children =children
     }
 end
 

@@ -1,91 +1,8 @@
 local Block = require("vimdoc.blocks")
-local inline = require("vimdoc.inline")
+local adapt = require("vimdoc.adapters.helpers")
+local tree = require("vimdoc.treesitter")
 
 local M = {}
-
-local function handle_inline_text()
-
-end
-
-local function handle_inline_link()
-
-end
-
-local function handle_inline_code()
-
-end
-
-local function handle_inline_strong()
-
-end
-
-local function handle_inline_emphasis()
-
-end
-
-local function handle_inline_anchor()
-
-end
-
-local inline_handlers = {
-    text = handle_inline_text,
-    link = handle_inline_link,
-    code = handle_inline_code,
-    strong = handle_inline_strong,
-    emphasis = handle_inline_emphasis,
-    anchor = handle_inline_anchor,
-
-}
-
-
-
-
-local function parse_inline(node, lines)
-    inline_nodes = {}
-    local text
-
-    for child in node:iter_children() do
-        if child:type() == "inline" then
-            text = node_text(child, lines)
-        end
-
-        local start_link, end_link, label, target = text:find("%[([^%]]+)%]%(([^%)]+)%)")
-
-        if start_link then
-            inline_handlers.link(start_link, end_link, label, target)
-        end
-    end
-end
-
-
-local function normalize_inline(text)
-    -- remove HTML anchors
-    text = text:gsub("<a.-</a>", function(anchor)
-        return anchor:match(">(.-)<") or ""
-    end)
-
-    -- remove markdown links
-    text = text:gsub("%[(.-)%]%b()", "%1")
-
-    return text
-end
-local function node_text(node, source)
-    return normalize_inline(vim.treesitter.get_node_text(node, source))
-end
-
-
-local function find_descendant(node, type)
-    if node:type() == type then
-        return node
-    end
-    for i = 0, node:child_count() - 1 do
-        local result = find_descendant(node:child(i), type)
-        if result then
-            return result
-        end
-    end
-    return nil
-end
 
 local function heading_level(node)
     local level = node:type():match("^atx_h(%d+)_marker$")
@@ -94,7 +11,7 @@ end
 
 local function handle_heading(node, blocks, lines)
     local level
-    local text
+    local inline_node
 
     for child in node:iter_children() do
         if not level then
@@ -102,28 +19,26 @@ local function handle_heading(node, blocks, lines)
         end
 
         if child:type() == "inline" then
-            text = node_text(child, lines)
+            inline_node = child
         end
     end
-
-    table.insert(
-        blocks,
-        Block.heading(text, level)
-    )
+    if inline_node then
+        table.insert(
+            blocks,
+            Block.heading(
+                adapt.node_inline(inline_node, lines),
+                level
+            )
+        )
+    end
 end
 
 local function handle_paragraph(node, blocks, lines)
-    local text
-    for child in node:iter_children() do
-        if child:type() == "inline" then
-            text = node_text(child, lines)
-            break
-        end
-    end
+    local inline_node = tree.find_descendant(node, "inline")
 
     table.insert(
         blocks,
-        Block.paragraph(text)
+        Block.paragraph(adapt.node_inline(inline_node, lines))
     )
 end
 
@@ -135,9 +50,9 @@ local function handle_codeblock(node, blocks, lines)
         local type = child:type()
 
         if type == "info_string" then
-            language = node_text(child, lines)
+            language = adapt.node_text(child, lines)
         elseif type == "code_fence_content" then
-            text = node_text(child, lines)
+            text = adapt.node_text(child, lines)
         end
     end
 
@@ -152,10 +67,15 @@ local function handle_list(node, blocks, lines)
 
     for i = 0, node:child_count() - 1 do
         local item = node:child(i)
+
         if item:type() == "list_item" then
-            local text = find_descendant(item, "inline")
-            if text then
-                table.insert(items, node_text(text, lines))
+            local inline = tree.find_descendant(item, "inline")
+
+            if inline then
+                table.insert(
+                    items,
+                    adapt.node_inline(inline, lines)
+                )
             end
         end
     end
@@ -185,19 +105,10 @@ local function walk(node, blocks, lines)
     end
 end
 
-function M.debug_dump(node, depth)
-    depth = depth or 0
 
-    print(string.rep("  ", depth) .. node:type())
-
-    for i = 0, node:child_count() - 1 do
-        M.debug_dump(node:child(i), depth + 1)
-    end
-end
-
-function M.adapt(tree, raw)
+function M.adapt(parsed_tree, raw)
     local blocks = {}
-    local root = tree:root()
+    local root = parsed_tree:root()
 
     walk(root, blocks, raw)
 
