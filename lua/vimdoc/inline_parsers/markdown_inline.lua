@@ -1,8 +1,6 @@
 local inline = require("vimdoc.inline")
+local engine = require("vimdoc.inline_parsers.engine")
 
-local M = {}
-
-local parse_inline
 
 local function parse_unknown(text)
     return inline.text(text:sub(1, 1)), text:sub(2)
@@ -23,7 +21,7 @@ local function parse_text(text)
         text:sub(position)
 end
 
-local function parse_link(text)
+local function parse_link(text,parse_inline)
     local label, target = text:match("^%[([^]]+)%]%(([^)]+)%)")
 
     if not label then
@@ -51,7 +49,7 @@ local function parse_code(text)
         text:sub(#full + 1)
 end
 
-local function parse_strong(text)
+local function parse_strong(text,parse_inline)
     local full, content =
         text:match("^(%*%*(.-)%*%*)")
 
@@ -70,7 +68,7 @@ local function parse_strong(text)
         text:sub(#full + 1)
 end
 
-local function parse_emphasis(text)
+local function parse_emphasis(text,parse_inline)
     local full, content =
         text:match("^(%*(.-)%*)")
 
@@ -89,7 +87,7 @@ local function parse_emphasis(text)
         text:sub(#full + 1)
 end
 
-local function parse_anchor(text)
+local function parse_anchor(text,parse_inline)
     local full_match, id, content = text:match(
         "^(<a%s+name=['\"](.-)['\"]>(.-)</a>)"
     )
@@ -102,7 +100,8 @@ local function parse_anchor(text)
         text:sub(#full_match + 1)
 end
 
-local parsers = {
+
+local parse_inline = engine.make({
     parse_anchor,
     parse_code,
     parse_link,
@@ -110,35 +109,8 @@ local parsers = {
     parse_emphasis,
     parse_text,
     parse_unknown,
+})
 
+return {
+    parse = parse_inline,
 }
-
-parse_inline = function(text)
-    local children = {}
-
-    while #text > 0 do
-        local matched = false
-
-        for _, parser in ipairs(parsers) do
-            local block, remaining = parser(text)
-
-            if block then
-                table.insert(children, block)
-                text = remaining
-                matched = true
-                break
-            end
-        end
-
-        if not matched then
-            error("Inline parser failed to consume input: " .. text)
-        end
-    end
-    return children
-end
-
-function M.parse(text)
-    return parse_inline(text)
-end
-
-return M

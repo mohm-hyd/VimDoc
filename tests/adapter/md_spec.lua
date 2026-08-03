@@ -1,6 +1,7 @@
---local parser = require("vimdoc.parser")
+local parser = require("vimdoc.parser")
 
-local fixture_path = "./tests/moses.md"
+local fixture_path = "tests/fixtures/basic.md"
+local expected_path = "tests/expected/basic_md.lua"
 
 local function read_file(path)
     local file = assert(io.open(path, "r"))
@@ -10,49 +11,33 @@ local function read_file(path)
     return content
 end
 
-local function node_text(node, source)
-    return vim.treesitter.get_node_text(node, source)
-end
 
-local function debug_dump(node, depth)
-    depth = depth or 0
-
-    print(string.rep("  ", depth) .. node:type())
-
-    if node:type() == "inline" then
-        print(node_text(node,Doc.raw))
-        for child in node:iter_children() do
-            print(
-                child:type(),
-                vim.inspect(node_text(child,Doc.raw))
-            )
-        end
-    end
-
-    for i = 0, node:child_count() - 1 do
-        debug_dump(node:child(i), depth + 1)
-    end
-end
-
-
-local function build_tree(text, lang)
-    local parser = vim.treesitter.get_string_parser(text, lang)
-    return parser:parse()[1]
-end
-
-local function parse(doc)
-    local tree = build_tree(doc.raw, doc.source.format)
-    return tree
-end
-
-Doc = {
+local doc = {
     raw = read_file(fixture_path),
     source = {
         format = "markdown",
     }
 }
 
-local tree = parse(Doc)
-local root = tree:root()
+local expected = dofile(expected_path)
 
-debug_dump(root)
+local actual = parser.parse(doc)
+
+local function assert_same(_actual, _expected)
+    if not vim.deep_equal(_actual, _expected) then
+        print("Expected:")
+        print(vim.inspect(_expected))
+
+        print("Actual:")
+        print(vim.inspect(_actual))
+
+        error("Assertion failed")
+    end
+end
+
+
+assert_same(actual, expected)
+
+
+
+assert(vim.deep_equal(actual, expected))

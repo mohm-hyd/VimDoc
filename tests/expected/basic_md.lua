@@ -14,7 +14,7 @@ return
     type = "paragraph"
 }, {
     language = "lua",
-    text = 'print("hello world")\nprint("another line")',
+    text = '    print("hello world")\n    print("another line")\n',
     type = "code"
 }, {
     children = { {

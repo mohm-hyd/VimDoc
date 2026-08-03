@@ -26,7 +26,7 @@ local function handle_heading(node, blocks, lines)
         table.insert(
             blocks,
             Block.heading(
-                adapt.node_inline(inline_node, lines),
+                adapt.markdown_inline(inline_node, lines),
                 level
             )
         )
@@ -38,7 +38,7 @@ local function handle_paragraph(node, blocks, lines)
 
     table.insert(
         blocks,
-        Block.paragraph(adapt.node_inline(inline_node, lines))
+        Block.paragraph(adapt.markdown_inline(inline_node, lines))
     )
 end
 
@@ -74,7 +74,7 @@ local function handle_list(node, blocks, lines)
             if inline then
                 table.insert(
                     items,
-                    adapt.node_inline(inline, lines)
+                    adapt.markdown_inline(inline, lines)
                 )
             end
         end

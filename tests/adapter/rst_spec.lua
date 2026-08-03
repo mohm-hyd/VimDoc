@@ -1,7 +1,7 @@
 local parser = require("vimdoc.parser")
 
 local fixture_path = "tests/fixtures/basic.rst"
-local expected_path = "tests/expected/basic.lua"
+local expected_path = "tests/expected/basic_rst.lua"
 
 local function read_file(path)
     local file = assert(io.open(path, "r"))

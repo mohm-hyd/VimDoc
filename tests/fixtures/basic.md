@@ -1,17 +1,13 @@
-*render.test*
-
-Test Document
-=============
+# Test Document
 
 This is a simple paragraph that should be parsed correctly.
 
->lua
+```lua
     print("hello world")
     print("another line")
-<
+```
 
-Features
---------
+## Features
 
 * First item
 * Second item

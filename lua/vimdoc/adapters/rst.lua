@@ -1,19 +1,18 @@
-local Block=require("vimdoc.blocks")
+local Block = require("vimdoc.blocks")
+local adapt = require("vimdoc.adapters.helpers")
+local tree = require("vimdoc.treesitter")
 
 local M = {}
 
 --Helpers
 
-local function node_text(node, source)
-    return vim.treesitter.get_node_text(node, source)
-end
 
 local function heading_level(section, lines)
     for i = 0, section:child_count() - 1 do
         local child = section:child(i)
 
         if child:type() == "adornment" then
-            local text = node_text(child, lines)
+            local text = adapt.node_text(child, lines)
 
             if text:match("^=+") then
                 return 1
@@ -25,79 +24,73 @@ local function heading_level(section, lines)
     return 1
 end
 
-local function find_descendant(node, type)
-    if node:type() == type then
-        return node
-    end
+local function handle_section(node, blocks, lines, walk)
+    local title
+
     for i = 0, node:child_count() - 1 do
-        local result = find_descendant(node:child(i), type)
-        if result then
-            return result
+        local child = node:child(i)
+        if child:type() == "title" then
+            title = child
+            break
         end
     end
-    return nil
-end
 
---Type handlers
-local function handle_section(node,blocks, lines,walk)
-
-        local title
-
-        for i = 0, node:child_count() - 1 do
-            local child = node:child(i)
-            if child:type() == "title" then
-                title = child
-                break
-            end
-        end
-
-        if title then
-            table.insert(
-                blocks,
-                Block.heading(node_text(title, lines), heading_level(node, lines))
+    if title then
+        table.insert(
+            blocks,
+            Block.heading(
+                adapt.rst_inline(title, lines),
+                heading_level(node, lines)
             )
+        )
+    end
+
+    for i = 0, node:child_count() - 1 do
+        local child = node:child(i)
+
+        if child:type() ~= "title" and child:type() ~= "adornment" then
+            walk(child, blocks, lines)
         end
+    end
+end
 
-        for i = 0, node:child_count() - 1 do
-            local child = node:child(i)
+local function handle_paragraph(node, blocks, lines)
+    table.insert(
+        blocks,
+        Block.paragraph(
+            adapt.rst_inline(node, lines)
+        )
+    )
+end
 
-            if child:type() ~= "title" and child:type() ~= "adornment" then
-                    walk(child, blocks, lines)
+local function handle_codeblock(node, blocks, lines)
+    table.insert(
+        blocks,
+        Block.code(adapt.node_text(node, lines))
+    )
+end
+
+local function handle_list(node, blocks, lines)
+    local items = {}
+
+    for i = 0, node:child_count() - 1 do
+        local item = node:child(i)
+
+        if item:type() == "list_item" then
+            local inline = tree.find_descendant(item, "paragraph")
+
+            if inline then
+                table.insert(
+                    items,
+                    adapt.rst_inline(inline, lines)
+                )
             end
         end
-end
-
-local function handle_paragraph(node,blocks,lines)
-        table.insert(
-            blocks,
-            Block.paragraph(node_text(node, lines))
-        )
-end
-
-local function handle_codeblock(node,blocks,lines)
-        table.insert(
-            blocks,
-            Block.code(node_text(node, lines))
-        )
-end
-
-local function handle_list(node,blocks,lines)
-
-        local items = {}
-
-        for i = 0, node:child_count() - 1 do
-            local item = node:child(i)
-            if item:type() == "list_item" then
-                local paragraph = find_descendant(item, "paragraph")
-                if paragraph then
-                    table.insert(items, node_text(paragraph,lines))
-                end
-            end
-        end
-        table.insert(
-            blocks,
-            Block.list(items)
-        )
+    end
+    table.insert(
+        blocks,
+        Block.list(items)
+    )
 end
 
 local handlers = {
@@ -106,7 +99,7 @@ local handlers = {
     literal_block = handle_codeblock,
     bullet_list = handle_list,
 }
---Walk the tree
+
 local function walk(node, blocks, lines)
     local handler = handlers[node:type()]
 
@@ -120,20 +113,10 @@ local function walk(node, blocks, lines)
     end
 end
 
-function M.debug_dump(node, depth)
-    depth = depth or 0
 
-    print(string.rep("  ", depth) .. node:type())
-
-    for i = 0, node:child_count() - 1 do
-        M.debug_dump(node:child(i), depth + 1)
-    end
-end
-
-
-function M.adapt(tree, raw)
+function M.adapt(parsed_tree, raw)
     local blocks = {}
-    local root = tree:root()
+    local root = parsed_tree:root()
 
     walk(root, blocks, raw)
 
