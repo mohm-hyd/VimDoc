@@ -1,5 +1,10 @@
 local M   = {}
 
+---@class ConfigOptions
+---@field output_dir string?
+---@field sources table<string,Source>
+
+---@type ConfigOptions
 M.options = {
     output_dir = nil,
     sources = {}

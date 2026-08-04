@@ -45,4 +45,3 @@ assert_same(actual, expected)
 
 
 
-assert(vim.deep_equal(actual, expected))

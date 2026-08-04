@@ -6,9 +6,9 @@ local writer   = require("vimdoc.writer")
 local cache    = require("vimdoc.cache")
 local helptags = require("vimdoc.helptags")
 
-local M        = {}
+local M = {}
 
-
+---@param request OpenRequest
 function M.open(request)
     print("Getting the docs for:", request.page)
     local source = config.options.sources[request.source]
@@ -32,6 +32,7 @@ function M.open(request)
         return
     end
 
+    ---@cast doc Document
     local raw, err = fetchers[doc.source.fetcher].fetch(doc)
 
     if not raw then
@@ -43,11 +44,9 @@ function M.open(request)
     end
 
     doc.raw = raw
-
-    doc.content = parser.parse(doc)
-    assert(doc.content, "Parser returned no content")
-
+    doc.content = assert(parser.parse(doc))
     doc.output = renderer.render(doc)
+
     writer.write(path, doc.output)
 
     helptags.update_helptags()

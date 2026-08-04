@@ -2,6 +2,9 @@ local http = require("vimdoc.http")
 
 local M = {}
 
+---@param source MediaWikiSource
+---@param title string
+---@return string
 local function genUrl(source, title)
     local params = {
         action = "query",
@@ -22,6 +25,9 @@ local function genUrl(source, title)
     return source.project_url .. source.endpoint .."?".. parameters
 end
 
+---@param doc MediaWikiDocument
+---@return string?
+---@return string?
 function M.fetch(doc)
     local url = genUrl(doc.source, doc.page)
     return http.get(url)

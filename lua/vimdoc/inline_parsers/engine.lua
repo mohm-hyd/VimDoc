@@ -1,8 +1,12 @@
 local M = {}
 
+---@param parsers InlineRule[]
+---@return InlineParser
 function M.make(parsers)
     local parse_inline
 
+    ---@param text string
+    ---@return InlineNode[]
     parse_inline = function(text)
         local children = {}
 

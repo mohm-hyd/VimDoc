@@ -2,6 +2,9 @@ local adapters = require("vimdoc.adapters")
 
 M = {}
 
+---@param text string
+---@param lang string
+---@return TSTree
 local function build_tree(text, lang)
     local parser = vim.treesitter.get_string_parser(text, lang)
     return parser:parse()[1]

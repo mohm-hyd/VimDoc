@@ -1,11 +1,16 @@
 local inline = require("vimdoc.inline")
 local engine = require("vimdoc.inline_parsers.engine")
 
-
+---@param text string
+---@return Text
+---@return string remaining
 local function parse_unknown(text)
     return inline.text(text:sub(1, 1)), text:sub(2)
 end
 
+---@param text string
+---@return Text?
+---@return string remaining
 local function parse_text(text)
     local position = text:find("[%[%`*_]")
 
@@ -21,7 +26,11 @@ local function parse_text(text)
         text:sub(position)
 end
 
-local function parse_link(text,parse_inline)
+---@param text string
+---@param parse_inline InlineParser
+---@return Link?
+---@return string remaining
+local function parse_link(text, parse_inline)
     local label, target = text:match("^%[([^]]+)%]%(([^)]+)%)")
 
     if not label then
@@ -38,6 +47,9 @@ local function parse_link(text,parse_inline)
     return block, text:sub(consumed + 1)
 end
 
+---@param text string
+---@return InlineCode?
+---@return string remaining
 local function parse_code(text)
     local full, content = text:match("^(`([^`]+)`)")
 
@@ -49,7 +61,11 @@ local function parse_code(text)
         text:sub(#full + 1)
 end
 
-local function parse_strong(text,parse_inline)
+---@param text string
+---@param parse_inline InlineParser
+---@return Strong?
+---@return string remaining
+local function parse_strong(text, parse_inline)
     local full, content =
         text:match("^(%*%*(.-)%*%*)")
 
@@ -68,7 +84,11 @@ local function parse_strong(text,parse_inline)
         text:sub(#full + 1)
 end
 
-local function parse_emphasis(text,parse_inline)
+---@param text string
+---@param parse_inline InlineParser
+---@return Emphasis?
+---@return string remaining
+local function parse_emphasis(text, parse_inline)
     local full, content =
         text:match("^(%*(.-)%*)")
 
@@ -87,7 +107,11 @@ local function parse_emphasis(text,parse_inline)
         text:sub(#full + 1)
 end
 
-local function parse_anchor(text,parse_inline)
+---@param text string
+---@param parse_inline InlineParser
+---@return Anchor?
+---@return string remaining
+local function parse_anchor(text, parse_inline)
     local full_match, id, content = text:match(
         "^(<a%s+name=['\"](.-)['\"]>(.-)</a>)"
     )

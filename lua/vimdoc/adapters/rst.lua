@@ -4,31 +4,33 @@ local tree = require("vimdoc.treesitter")
 
 local M = {}
 
---Helpers
-
-
-local function heading_level(section, lines)
-    for i = 0, section:child_count() - 1 do
-        local child = section:child(i)
-
+---@param node TSNode
+---@param lines string
+---@return integer
+local function heading_level(node, lines)
+    for child in node:iter_children() do
         if child:type() == "adornment" then
-            local text = adapt.node_text(child, lines)
+            local underline = adapt.node_text(child, lines)
 
-            if text:match("^=+") then
+            if underline:match("^=+$") then
                 return 1
-            elseif text:match("^%-+") then
+            elseif underline:match("^%-+$") then
                 return 2
+            elseif underline:match("^%~+$") then
+                return 3
             end
         end
     end
     return 1
 end
 
+---@param node TSNode
+---@param blocks Block[]
+---@param lines string
 local function handle_section(node, blocks, lines, walk)
     local title
 
-    for i = 0, node:child_count() - 1 do
-        local child = node:child(i)
+    for child in node:iter_children() do
         if child:type() == "title" then
             title = child
             break
@@ -45,15 +47,16 @@ local function handle_section(node, blocks, lines, walk)
         )
     end
 
-    for i = 0, node:child_count() - 1 do
-        local child = node:child(i)
-
+    for child in node:iter_children() do
         if child:type() ~= "title" and child:type() ~= "adornment" then
             walk(child, blocks, lines)
         end
     end
 end
 
+---@param node TSNode
+---@param blocks Block[]
+---@param lines string
 local function handle_paragraph(node, blocks, lines)
     table.insert(
         blocks,
@@ -63,6 +66,9 @@ local function handle_paragraph(node, blocks, lines)
     )
 end
 
+---@param node TSNode
+---@param blocks Block[]
+---@param lines string
 local function handle_codeblock(node, blocks, lines)
     table.insert(
         blocks,
@@ -70,12 +76,13 @@ local function handle_codeblock(node, blocks, lines)
     )
 end
 
+---@param node TSNode
+---@param blocks Block[]
+---@param lines string
 local function handle_list(node, blocks, lines)
     local items = {}
 
-    for i = 0, node:child_count() - 1 do
-        local item = node:child(i)
-
+    for item in node:iter_children() do
         if item:type() == "list_item" then
             local inline = tree.find_descendant(item, "paragraph")
 
@@ -93,6 +100,7 @@ local function handle_list(node, blocks, lines)
     )
 end
 
+---@type  table<string,Handler>
 local handlers = {
     section = handle_section,
     paragraph = handle_paragraph,
@@ -100,6 +108,9 @@ local handlers = {
     bullet_list = handle_list,
 }
 
+---@param node TSNode
+---@param blocks Block[]
+---@param lines string
 local function walk(node, blocks, lines)
     local handler = handlers[node:type()]
 
@@ -108,12 +119,15 @@ local function walk(node, blocks, lines)
         return
     end
 
-    for i = 0, node:child_count() - 1 do
-        walk(node:child(i), blocks, lines)
+    for child in node:iter_children() do
+        walk(child, blocks, lines)
     end
 end
 
 
+---@param parsed_tree TSTree
+---@param raw string
+---@return Block[]
 function M.adapt(parsed_tree, raw)
     local blocks = {}
     local root = parsed_tree:root()

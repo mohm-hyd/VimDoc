@@ -1,4 +1,8 @@
 local M = {}
+
+---@param url string
+---@return string?
+---@return string?
 function M.get(url)
     local result = vim.system({
         "curl",
@@ -10,7 +14,7 @@ function M.get(url)
         local err = result.stderr
 
         if err and err ~= "" then
-            return nil,err
+            return nil, err
         end
 
         return nil, "curl failed with exit code " .. result.code

@@ -1,12 +1,14 @@
 local M = {}
 
-
+---@param node TSNode
+---@param type string
+---@return TSNode?
 function M.find_descendant(node, type)
     if node:type() == type then
         return node
     end
-    for i = 0, node:child_count() - 1 do
-        local result = M.find_descendant(node:child(i), type)
+    for child in node:iter_children() do
+        local result = M.find_descendant(child, type)
         if result then
             return result
         end

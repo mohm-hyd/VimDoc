@@ -1,5 +1,8 @@
 local M = {}
 
+---@param path string
+---@param lines string
+---@return boolean
 function M.write(path, lines)
     local dir = vim.fn.fnamemodify(path, ":h")
 
