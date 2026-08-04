@@ -1,9 +1,9 @@
 local vimdoc = require("vimdoc")
 
-vim.api.nvim_create_user_command("Vimdoc",function(opts)
+vim.api.nvim_create_user_command("Vimdoc", function(opts)
         if #opts.fargs < 2 then
             vim.notify("Usage: :Vimdoc <source> <page>", vim.log.levels.ERROR)
-            return 
+            return
         end
 
         vimdoc.open({

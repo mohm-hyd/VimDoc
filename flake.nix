@@ -1,5 +1,6 @@
 {
   description = "Vimdoc development";
+
   inputs.nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
 
   outputs =
@@ -7,26 +8,45 @@
     let
       system = "x86_64-linux";
       pkgs = import nixpkgs { inherit system; };
+
+      treesitter = pkgs.vimPlugins.nvim-treesitter.withPlugins (p: [
+        p.lua
+        p.rst
+        p.markdown
+        p.html
+      ]);
+
+      nvim = pkgs.wrapNeovim pkgs.neovim-unwrapped {
+        configure = {
+          packages.myPlugins = {
+            start = [
+              treesitter
+            ];
+          };
+        };
+      };
     in
     {
       devShells.${system}.default = pkgs.mkShell {
         packages = [
-          pkgs.neovim
+          nvim
           pkgs.git
           pkgs.curl
-          pkgs.tree-sitter
         ];
+
         shellHook = ''
           echo "Vimdoc testing environment"
-          echo "Test env: nvim -u dev/init.lua ."
+          echo "Test env: nvim -u tests/init.lua ."
+
           vd() {
-                if [ $# -eq 0 ]; then
-                    nvim -u dev/init.lua
-                else
-                    nvim -u dev/init.lua "+Vimdoc $*"
-                fi
+            if [ $# -eq 0 ]; then
+              nvim -u tests/init.lua
+            else
+              nvim -u tests/init.lua "+Vimdoc $*"
+            fi
           }
-          alias cl='./dev/clean'
+
+          alias cl='./tests/clean'
         '';
       };
 
@@ -34,17 +54,36 @@
         pkgs.runCommand "Vimdoc-tests"
           {
             buildInputs = [
-              pkgs.neovim
+              nvim
+              pkgs.git
+              pkgs.curl
             ];
+
             src = self;
           }
           ''
-            cd $src
+            set -eux
 
-            nvim --headless \
-                -u dev/init.lua \
-                -l tests/adapter/rst_spec.lua \
-            touch $out
-          '';
+            cd $src
+            export HOME=$(mktemp -d)
+
+            echo "Nvim path:"
+            ${nvim}/bin/nvim --version
+
+            echo "Runtime paths:"
+            ${nvim}/bin/nvim --headless \
+              -u tests/nix_init.lua \
+              +"lua print(vim.inspect(vim.api.nvim_list_runtime_paths()))" \
+              +q
+
+            echo "Running tests..."
+
+            ${nvim}/bin/nvim --headless \
+              -u tests/nix_init.lua \
+              -l tests/run.lua
+
+            echo "Tests finished"
+
+            touch $out          '';
     };
 }
