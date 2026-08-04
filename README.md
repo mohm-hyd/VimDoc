@@ -16,7 +16,7 @@ This architecture allows multiple documentation formats to share the same render
 ## Current Features
 
 - Fetches documentation from supported sources.
-- Tree-sitter–based RST parsing.
+- Tree-sitter–based RST and Markdown parsing.
 - Adapter architecture.
 - Renderer that generates native Vim help files and helptags automatically.
 - Automatic caching.
@@ -63,10 +63,13 @@ to access documentation inside Neovim.
 
 ✓ reStructuredText
   - Tree-sitter parsing
+  - Inline parsing
   - Helptag generation
 
-○ Markdown
-  - Planned
+✓ Markdown 
+  - Tree-sitter parsing
+  - Inline parsing
+  - Helptag generation
 
 ○ HTML
   - Planned
@@ -90,7 +93,6 @@ flowchart TD
 
 ## Project Roadmap
 
-- Markdown adapter
 - HTML adapter
 - Additional fetchers
 - Download entire documentation sets

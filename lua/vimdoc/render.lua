@@ -14,7 +14,7 @@ inline_renderers.link = function(node)
 end
 
 inline_renderers.inline_code = function(node)
-    return node.text
+    return "`" .. node.text .. "`"
 end
 
 inline_renderers.strong = function(node)
@@ -31,7 +31,6 @@ end
 
 
 render_inline = function(content)
-
     local pieces = {}
 
     for _, node in ipairs(content) do
@@ -50,18 +49,17 @@ end
 
 
 local function render_heading(block, output)
-
     local text = render_inline(block.children)
 
-    table.insert(output,text)
+    table.insert(output, text)
 
     if block.level == 1 then
-        table.insert(output,string.rep("=", #text))
+        table.insert(output, string.rep("=", #text))
     elseif block.level == 2 then
-        table.insert(output,string.rep("-", #text))
+        table.insert(output, string.rep("-", #text))
     end
 
-    table.insert(output,"")
+    table.insert(output, "")
 end
 
 local function render_paragraph(block, output)
@@ -70,7 +68,6 @@ local function render_paragraph(block, output)
 end
 
 local function render_code(block, output)
-
     table.insert(
         output,
         ">" .. (block.language or "")
@@ -116,6 +113,9 @@ function M.render(doc)
         end
     end
 
+    table.insert(output, "")
+    table.insert(output, string.rep("=", 80))
+    table.insert(output, "vim:tw=80:ts=2:ft=help:norl:syntax=help\n")
     return table.concat(output, "\n")
 end
 

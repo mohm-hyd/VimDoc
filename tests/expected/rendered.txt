@@ -16,3 +16,7 @@ Features
 * First item
 * Second item
 * Third item
+
+
+================================================================================
+vim:tw=80:ts=2:ft=help:norl:syntax=help
