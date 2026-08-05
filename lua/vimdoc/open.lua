@@ -6,7 +6,7 @@ local writer   = require("vimdoc.writer")
 local cache    = require("vimdoc.cache")
 local helptags = require("vimdoc.helptags")
 
-local M = {}
+local M        = {}
 
 ---@param request OpenRequest
 function M.open(request)
@@ -49,8 +49,9 @@ function M.open(request)
 
     writer.write(path, doc.output)
 
+    vim.opt.runtimepath:append(path)
     helptags.update_helptags()
-    vim.cmd("h " .. doc.tag)
+    vim.cmd("help " .. doc.tag)
 end
 
 return M

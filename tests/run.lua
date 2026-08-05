@@ -15,6 +15,7 @@ for _, test in ipairs(tests) do
     end
 end
 
-print("All tests passed\n")
+print("All tests passed \n")
+
 
 vim.cmd("qa")

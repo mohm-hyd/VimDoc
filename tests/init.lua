@@ -6,14 +6,14 @@ vim.pack.add({
 
 
 require("nvim-treesitter").setup({
-	ensure_installed = { "lua","rst","markdown","html"},
-	highlight = { enable = true },
-	indent = { enable = true },
-	})
+    ensure_installed = { "lua", "rst", "markdown", "html" },
+    highlight = { enable = true },
+    indent = { enable = true },
+})
 
 
 require("vimdoc").setup({
-    output_dir = "./doc",
+    output_dir = "./docs",
     sources = {
         rtd = {
             name = "readthedocs",
@@ -22,7 +22,7 @@ require("vimdoc").setup({
             branch = "main",
             doc_path = "docs/user",
             format = "rst",
-            extension =".rst",
+            extension = ".rst",
         },
         hump = {
 
