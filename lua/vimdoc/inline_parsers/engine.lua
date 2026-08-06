@@ -1,13 +1,16 @@
 local M = {}
-
 ---@param parsers InlineRule[]
 ---@return InlineParser
 function M.make(parsers)
     local parse_inline
 
-    ---@param text string
+    ---@param text string?
     ---@return InlineNode[]
     parse_inline = function(text)
+        if not text or type(text) ~= "string" or #text == 0 then
+            return {}
+        end
+
         local children = {}
 
         while #text > 0 do
@@ -17,15 +20,17 @@ function M.make(parsers)
                 local block, remaining = parser(text, parse_inline)
 
                 if block then
-                    table.insert(children, block)
-                    text = remaining
+                    if block.type ~= "ignore" then
+                        table.insert(children, block)
+                    end
+                    text = remaining or ""
                     matched = true
                     break
                 end
             end
 
             if not matched then
-                error("Inline parser failed: " .. text)
+                error("Inline parser failed on remaining text: " .. text)
             end
         end
 

@@ -9,12 +9,8 @@ local M = {}
 ---@return integer
 local function heading_level(node)
     local level = node:type():match("^atx_h(%d+)_marker$")
-    assert(level)
 
-    local number_level = tonumber(level)
-    assert(number_level)
-
-    return math.floor(number_level)
+    return level and tonumber(level) or 1
 end
 
 ---@param node TSNode

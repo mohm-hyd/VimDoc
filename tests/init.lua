@@ -13,7 +13,7 @@ require("nvim-treesitter").setup({
 
 
 require("vimdoc").setup({
-    output_dir = "./docs",
+    output_dir = "./doc",
     sources = {
         rtd = {
             name = "readthedocs",

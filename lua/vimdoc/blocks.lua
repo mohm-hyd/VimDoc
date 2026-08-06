@@ -41,4 +41,13 @@ function M.list(items)
     }
 end
 
+---@param rows InlineNode[][][]
+---@return Table
+function M.table(rows)
+    return {
+        type = "table",
+        rows = rows,
+    }
+end
+
 return M

@@ -58,4 +58,9 @@ function M.anchor(id, children)
     }
 end
 
+---@return table
+function M.ignore()
+    return { type = "ignore" }
+end
+
 return M

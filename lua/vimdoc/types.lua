@@ -55,11 +55,16 @@
 ---@field type "list"
 ---@field items ListItem[]
 ---
+---@class Table
+---@field type "table"
+---@field rows InlineNode[][][]
+
 ---@alias Block
 ---|    Heading
 ---|    Paragraph
 ---|    Code
 ---|    List
+---|    Table
 
 ---@class GithubSource
 ---@field name string
