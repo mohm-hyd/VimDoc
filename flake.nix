@@ -40,9 +40,9 @@
 
           vd() {
             if [ $# -eq 0 ]; then
-              nvim -u tests/init.lua
+              nvim --clean -u tests/init.lua
             else
-              nvim -u tests/init.lua "+Vimdoc $*"
+              nvim --clean -u tests/init.lua "+Vimdoc $*"
             fi
           }
 

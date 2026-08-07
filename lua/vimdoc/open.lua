@@ -53,9 +53,6 @@ function M.open(request)
     writer.write(path, doc.output)
 
     local doc_dir = vim.fn.fnamemodify(path, ":h")
-    if vim.fn.isdirectory(doc_dir) == 0 then
-        vim.fn.mkdir(doc_dir, "p")
-    end
     if not vim.o.runtimepath:find(doc_dir, 1, true) then
         vim.opt.runtimepath:append(doc_dir)
     end

@@ -12,7 +12,6 @@ local function get_inner_html_text(node, lines)
         return vim.treesitter.get_node_text(node, lines)
     end
 
-    local text = ""
     local chunks = {}
     for child in node:iter_children() do
         if child:type() ~= "start_tag" and child:type() ~= "end_tag" then

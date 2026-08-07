@@ -58,18 +58,26 @@ end
 ---@param node Link
 ---@return string
 inline_renderers.link = function(node)
+    local target = node.target or ""
     local text = render_inline(node.children)
 
-    if node.target and (node.target:sub(1, 1) == "#" or not node.target:find("^https?://")) then
-        local tag = node.target:gsub("^#", "")
+    local lower_target = target:lower()
+    local is_url = lower_target:find("^https?://")
+        or lower_target:find("^ftp://")
+        or lower_target:find("^www%.")
+
+    if is_url then
+        if text ~= "" and text ~= target then
+            return text .. " (" .. target .. ")"
+        end
+        return target
+    end
+
+    if target ~= "" then
+        local tag = target:gsub("^#", "")
         return "|" .. tag .. "|"
     end
-
-    if text ~= "" and text ~= node.target then
-        return text .. " (" .. (node.target or "") .. ")"
-    end
-
-    return node.target or text
+    return text
 end
 
 ---@param node InlineCode
@@ -93,7 +101,13 @@ end
 ---@param node Anchor
 ---@return string
 inline_renderers.anchor = function(node)
-    local tag = node.id or render_inline(node.children)
+    local raw_tag = (node.id and node.id ~= "") and node.id or render_inline(node.children)
+
+    if not raw_tag or raw_tag == "" then
+        return ""
+    end
+
+    local tag = raw_tag:gsub("%s+", "-")
     return "*" .. tag .. "*"
 end
 

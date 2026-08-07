@@ -22,12 +22,12 @@ function M.paragraph(children)
 end
 
 ---@param text string
----@param lang string
+---@param lang string?
 ---@return Code
 function M.code(text, lang)
     return {
         type = "code",
-        language = lang or "lua",
+        language = lang,
         text = text,
     }
 end
